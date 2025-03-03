@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.hahlqy.dao.ds2.UserMapper">
+    <resultMap id="user" type="User">
+        <id column="username" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="enabled" property="enabled"/>
+    </resultMap>
+
+
+    <select id="selectAll" resultMap="user">
+        select * from users limit 0,5
+    </select>
+</mapper>
