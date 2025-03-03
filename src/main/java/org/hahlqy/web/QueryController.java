@@ -1,15 +1,12 @@
 package org.hahlqy.web;
 
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.hahlqy.dao.ds1.TacoMapper;
 import org.hahlqy.dao.ds2.UserMapper;
 import org.hahlqy.vo.Taco;
 import org.hahlqy.vo.User;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +32,14 @@ public class QueryController {
 
     @GetMapping("/getOne/{id}")
     public Taco getOne(@PathVariable int id) {
-        return tacoMapper.getTacoById(id);
+        return tacoMapper.selectById(id);
+    }
+
+
+    @GetMapping("/page")
+    public Page<Taco> page(int pageNo, int pageSize) {
+        Page<Taco> page = new Page<>(pageNo, pageSize);
+        return tacoMapper.selectPage(page, null);
     }
 
     @GetMapping("/getUserList")

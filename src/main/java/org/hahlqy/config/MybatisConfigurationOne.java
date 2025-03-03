@@ -1,6 +1,10 @@
 package org.hahlqy.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -17,7 +21,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan(value = "org.hahlqy.dao.ds1",sqlSessionFactoryRef = "SqlSessionFactoryOne")
+@MapperScan(value = {"org.hahlqy.dao.ds1"},sqlSessionFactoryRef = "SqlSessionFactoryOne")
 public class MybatisConfigurationOne {
 
 
@@ -31,16 +35,27 @@ public class MybatisConfigurationOne {
         return druidDataSource;
     }
 
+    /**
+     * 添加分页插件
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+
 
     @Bean(name = "SqlSessionFactoryOne")
     @Primary
-    public SqlSessionFactory sqlSessionFactoryOne( DataSource druidDataSource) throws Exception {
-        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+    public SqlSessionFactory sqlSessionFactoryOne( DataSource druidDataSource,MybatisPlusInterceptor interceptor) throws Exception {
+        MybatisSqlSessionFactoryBean mybatisPlus = new MybatisSqlSessionFactoryBean();
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sessionFactoryBean.setDataSource(druidDataSource);
-        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:mybatis/ds1/*.xml"));
-        sessionFactoryBean.setTypeAliasesPackage("org.hahlqy.vo");
-        return  sessionFactoryBean.getObject();
+        mybatisPlus.setDataSource(druidDataSource);
+        mybatisPlus.setMapperLocations(resolver.getResources("classpath*:mybatis/ds1/*.xml"));
+        mybatisPlus.setTypeAliasesPackage("org.hahlqy.vo");
+        mybatisPlus.setPlugins(interceptor);
+        return  mybatisPlus.getObject();
     }
 
 }
